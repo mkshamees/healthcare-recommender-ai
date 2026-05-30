@@ -1,53 +1,72 @@
 import os
 import joblib
+import numpy as np
+from app.services.disease_info import DISEASE_INFO
 
-from app.core.medical_mapper import normalize_symptoms
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 MODEL_PATH = os.path.join(BASE_DIR, "models", "disease_model.pkl")
+VECT_PATH = os.path.join(BASE_DIR, "models", "vectorizer.pkl")
+
+model = None
+vectorizer = None
 
 try:
     model = joblib.load(MODEL_PATH)
+    vectorizer = joblib.load(VECT_PATH)
     print("✅ Hospital AI model loaded")
-except Exception as e:
-    model = None
-    print("❌ Model load failed:", e)
+except:
+    print("❌ Model not loaded - fallback mode active")
 
 
-def predict_disease(symptoms):
+def clean_text(text):
+    return text.lower().strip()
 
-    symptoms = normalize_symptoms(symptoms)
 
-    if not symptoms.strip():
-        return {
-            "disease": "unknown",
-            "confidence": 0,
-            "status": "empty_input"
-        }
+def predict_disease(symptoms: str):
+    symptoms = clean_text(symptoms)
 
-    if model is None:
+    # fallback if model missing
+    if model is None or vectorizer is None:
         return {
             "disease": "flu",
             "confidence": 50,
             "status": "fallback"
         }
 
-    try:
-        pred = model.predict([symptoms])[0]
+    X = vectorizer.transform([symptoms])
 
-        confidence = 0
-        if hasattr(model, "predict_proba"):
-            confidence = float(max(model.predict_proba([symptoms])[0]) * 100)
+    # TOP 3 PREDICTIONS
+    probs = model.predict_proba(X)[0]
+    classes = model.classes_
 
-        return {
-            "disease": pred,
-            "confidence": round(confidence, 2),
-            "status": "success"
+    top_indices = np.argsort(probs)[::-1][:3]
+
+    results = []
+    for i in top_indices:
+        results.append({
+            "disease": classes[i],
+            "confidence": round(float(probs[i]) * 100, 2)
+        })
+
+    disease = results[0]["disease"]
+
+    # ✅ MUST BE INSIDE FUNCTION
+    info = DISEASE_INFO.get(
+        disease,
+        {
+            "description": "No information available",
+            "risk": "Unknown",
+            "advice": "Consult a healthcare professional"
         }
+    )
 
-    except Exception as e:
-        return {
-            "disease": "unknown",
-            "confidence": 0,
-            "status": str(e)
-        }
+    return {
+        "top_predictions": results,
+        "disease": disease,
+        "confidence": results[0]["confidence"],
+        "description": info["description"],
+        "risk": info["risk"],
+        "advice": info["advice"],
+        "status": "success"
+    }

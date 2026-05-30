@@ -1,72 +1,104 @@
-import pandas as pd
-import joblib
 import os
-import re
+import pandas as pd
+import numpy as np
+import joblib
 
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# =============================
+# BASE DIRECTORY
+# =============================
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# =============================
+# AUTO-FIND DATASET (NO STRUCTURE CHANGE)
+# =============================
+possible_paths = [
+    os.path.join(BASE_DIR, "training.csv"),
+    os.path.join(BASE_DIR, "dataset.csv"),
+    os.path.join(BASE_DIR, "data", "training.csv"),
+]
+
 DATA_PATH = os.path.join(BASE_DIR, "training", "dataset.csv")
-MODEL_PATH = os.path.join(BASE_DIR, "models", "disease_model.pkl")
 
-os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+for path in possible_paths:
+    if os.path.exists(path):
+        DATA_PATH = path
+        break
 
-# -------------------------
-# CLEAN FUNCTION
-# -------------------------
-def clean(text):
-    text = str(text).lower()
-    text = re.sub(r"[^a-z ]", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+if DATA_PATH is None:
+    raise FileNotFoundError(
+        "❌ training.csv not found. Put it in project root or training folder."
+    )
 
-# -------------------------
+print(f"📂 Using dataset: {DATA_PATH}")
+
+# =============================
 # LOAD DATA
-# -------------------------
+# =============================
 df = pd.read_csv(DATA_PATH)
+df = df.dropna()
 
-df["symptoms"] = df["symptoms"].apply(clean)
-df["disease"] = df["disease"].str.lower().str.strip()
+X = df["symptoms"].astype(str)
+y = df["disease"].astype(str)
 
-X = df["symptoms"]
-y = df["disease"]
+# =============================
+# TEXT VECTORISATION
+# =============================
+vectorizer = TfidfVectorizer()
+X_vec = vectorizer.fit_transform(X)
 
-# -------------------------
-# TRAIN SPLIT (STRATIFIED)
-# -------------------------
+# =============================
+# SAFE STRATIFY LOGIC
+# =============================
+class_counts = y.value_counts()
+
+if class_counts.min() < 2:
+    stratify = None
+else:
+    stratify = y
+
+# =============================
+# TRAIN TEST SPLIT
+# =============================
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.2,
+    X_vec,
+    y,
+    test_size=0.3,
     random_state=42,
-    stratify=y
+    stratify=stratify
 )
 
-# -------------------------
-# MODEL (IMPROVED)
-# -------------------------
-model = Pipeline([
-    ("tfidf", TfidfVectorizer(
-        ngram_range=(1, 3),   # BIG UPGRADE (captures medical phrases)
-        max_features=3000,
-        stop_words="english"
-    )),
-    ("clf", LogisticRegression(
-        max_iter=500,
-        class_weight="balanced"
-    ))
-])
+# =============================
+# MODEL
+# =============================
+model = RandomForestClassifier(
+    n_estimators=200,
+    random_state=42,
+    class_weight="balanced"
+)
 
-# -------------------------
-# TRAIN
-# -------------------------
 model.fit(X_train, y_train)
 
-# -------------------------
-# SAVE
-# -------------------------
-joblib.dump(model, MODEL_PATH)
+# =============================
+# EVALUATION
+# =============================
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
 
-print("✅ Hospital AI v4 model trained successfully")
+print("✅ Model trained successfully")
+print(f"📊 Accuracy: {accuracy * 100:.2f}%")
+
+# =============================
+# SAVE MODEL
+# =============================
+MODEL_DIR = os.path.join(BASE_DIR, "app", "models")
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+joblib.dump(model, os.path.join(MODEL_DIR, "disease_model.pkl"))
+joblib.dump(vectorizer, os.path.join(MODEL_DIR, "vectorizer.pkl"))
+
+print("💾 Model saved to app/models/")

@@ -5,56 +5,73 @@ from app.services.recommendations import recommend_medicine
 from app.services.emergency import is_emergency
 
 st.set_page_config(
-    page_title="Hospital AI",
-    page_icon="🏥",
+    page_title="🏥 Hospital AI",
     layout="centered"
 )
 
-st.title("🏥 Hospital AI")
-st.write("Enter symptoms to receive an AI-assisted assessment.")
+st.title("🏥 Hospital AI System")
+st.write("AI-powered disease prediction system")
 
-symptoms = st.text_area(
-    "Symptoms",
-    placeholder="Example: fever, cough, headache"
-)
+symptoms = st.text_area("Enter symptoms (e.g fever, cough, headache)")
 
 if st.button("Analyze"):
 
     if not symptoms.strip():
-        st.warning("Please enter symptoms.")
+        st.warning("Please enter symptoms")
         st.stop()
 
-    try:
+    if is_emergency(symptoms):
+        st.error("🚨 EMERGENCY DETECTED - SEEK MEDICAL HELP")
+        st.stop()
 
-        if is_emergency(symptoms):
-            st.error("🚨 Emergency symptoms detected. Seek immediate medical attention.")
-            st.stop()
+    result = predict_disease(symptoms)
 
-        result = predict_disease(symptoms)
+    st.subheader("🧠 Primary Diagnosis")
+    st.success(result["disease"])
 
-        st.subheader("🧠 Predicted Condition")
-        st.success(result.get("disease", "Unknown"))
+    st.subheader("📊 Confidence")
+    st.write(f"{result['confidence']}%")
 
-        st.subheader("📈 Confidence")
-        st.write(f"{result.get('confidence', 0)}%")
+    st.subheader("🏥 Top 3 Predictions")
+    for item in result.get("top_predictions", []):
+        st.write(f"• {item['disease']} — {item['confidence']}%")
 
-        if "category" in result:
-            st.subheader("📊 Category")
-            st.info(result["category"])
+    st.subheader("💊 Treatment Suggestion")
+    st.write(recommend_medicine(result["disease"]))
 
-        if "risk" in result:
-            st.subheader("⚠️ Risk Level")
-            st.warning(result["risk"])
+    st.subheader("📖 Disease Information")
+    st.write(result.get("description"))
 
-        st.subheader("💊 Recommendations")
-        st.write(
-            recommend_medicine(
-                result.get("disease", "unknown")
-            )
-        )
+    st.subheader("⚠️ Risk Level")
+    st.warning(result.get("risk"))
 
-        st.subheader("📄 Raw Result")
-        st.json(result)
+    st.subheader("📋 Medical Advice")
+    st.info(result.get("advice"))
 
-    except Exception as e:
-        st.error(f"System Error: {str(e)}")
+    report_text = f"""
+PATIENT HEALTH REPORT
+
+Symptoms:
+{symptoms}
+
+Predicted Disease:
+{result['disease']}
+
+Confidence:
+{result['confidence']}%
+
+Risk:
+{result['risk']}
+
+Advice:
+{result['advice']}
+"""
+
+    st.download_button(
+        label="📄 Download Report",
+        data=report_text,
+        file_name="health_report.txt",
+        mime="text/plain"
+    )
+
+    st.json(result)

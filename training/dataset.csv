@@ -1,39 +1,28 @@
 symptoms,disease
 headache blurred dizziness,hypertension
-chest shortness of breath,heart_disease
-fever cough headache pain,flu
-fever cough headache body,flu
-swollen legs fatigue reduced,kidney_disease
-pain shortness of breath,heart_disease
 headache vision dizziness,hypertension
-vomiting abdominal pain,food_poisoning
-headache blurred vision dizziness,hypertension
-swollen legs fatigue reduced urine,kidney_disease
-nausea vomiting pain,food_poisoning
-chest pain shortness of breath,heart_disease
-frequent urination excessive thirst,diabetes
+high blood pressure headache dizziness,hypertension
 chest pain shortness breath,heart_disease
-chest pain shortness of,heart_disease
-frequent urination excessive,diabetes
-swollen legs reduced urine,kidney_disease
-high fever chills sweating,malaria
-urination excessive thirst,diabetes
+chest pain shortness breath sweating,heart_disease
+chest pain breath fatigue,heart_disease
 fever cough headache body pain,flu
-high chills sweating,malaria
-chest pain of breath,heart_disease
-fever chills sweating,malaria
-cough headache body pain,flu
-high fever sweating,malaria
-swollen fatigue reduced urine,kidney_disease
-fever headache body pain,flu
-frequent urination thirst,diabetes
-nausea abdominal pain,food_poisoning
-headache blurred vision,hypertension
 fever cough body pain,flu
-blurred vision dizziness,hypertension
+fever chills sweating headache,flu
+swollen legs fatigue reduced urine,kidney_disease
+swollen legs reduced urine fatigue,kidney_disease
+foamy urine swelling legs fatigue,kidney_disease
+vomiting abdominal pain nausea,food_poisoning
 nausea vomiting abdominal pain,food_poisoning
-frequent excessive thirst,diabetes
-high fever chills,malaria
-swollen legs fatigue urine,kidney_disease
-nausea vomiting abdominal,food_poisoning
-legs fatigue reduced urine,kidney_disease
+vomiting diarrhea stomach pain,food_poisoning
+frequent urination excessive thirst,diabetes
+excessive thirst frequent urination fatigue,diabetes
+blurred vision frequent urination thirst,diabetes
+high fever chills sweating,malaria
+fever chills sweating body pain,malaria
+shaking chills high fever weakness,malaria
+fatigue pale skin dizziness,anemia
+weakness fatigue shortness breath,anemia
+pale skin dizziness fatigue,anemia
+muscle pain fever rash,viral_infection
+fever body rash headache,viral_infection
+joint pain fever weakness,viral_infection

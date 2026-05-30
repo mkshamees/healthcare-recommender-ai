@@ -1,10 +1,42 @@
-def triage_level(symptoms):
-    s = str(symptoms).lower()
+def triage_patient(symptoms: str):
+    symptoms = symptoms.lower()
 
-    if any(x in s for x in ["chest pain", "stroke", "breathing"]):
-        return "HIGH"
+    critical_keywords = [
+        "unconscious", "not breathing", "collapse",
+        "severe chest pain with sweating",
+        "stroke", "paralysis", "seizure"
+    ]
 
-    if any(x in s for x in ["fever", "cough", "pain"]):
-        return "MEDIUM"
+    urgent_keywords = [
+        "chest pain", 
+        "shortness of breath",
+        "high fever",
+        "persistent vomiting",
+        "severe headache",
+        "blurred vision"
+    ]
 
-    return "LOW"
+    # CRITICAL LEVEL
+    for word in critical_keywords:
+        if word in symptoms:
+            return {
+                "level": "CRITICAL",
+                "color": "red",
+                "action": "Seek emergency medical help immediately"
+            }
+
+    # URGENT LEVEL
+    for word in urgent_keywords:
+        if word in symptoms:
+            return {
+                "level": "URGENT",
+                "color": "orange",
+                "action": "See a doctor within 24 hours"
+            }
+
+    # LOW RISK
+    return {
+        "level": "LOW RISK",
+        "color": "green",
+        "action": "Home care or routine clinic visit"
+    }
