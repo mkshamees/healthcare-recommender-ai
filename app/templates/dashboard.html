@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Healthcare Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Healthcare Recommender Dashboard</h1>
+
+    <input id="symptom" placeholder="Enter disease (e.g diabetes)">
+    <button onclick="getRecommendation()">Get Recommendation</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+function getRecommendation() {
+    let symptom = document.getElementById("symptom").value;
+
+    fetch("/recommend", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: 1,
+            symptom: symptom
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerHTML =
+            "<h3>Medicine:</h3>" + data.medicine_recommendation.join(", ");
+    });
+}
+</script>
+
+</body>
+</html>

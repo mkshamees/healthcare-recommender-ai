@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Healthcare AI System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🏥 AI Healthcare Recommendation System</h1>
+
+    <p class="subtitle">
+        Enter symptoms to predict disease and get medicine suggestions
+    </p>
+
+    <textarea id="symptoms" placeholder="Enter symptoms (e.g fever cough headache)"></textarea>
+
+    <button onclick="predict()">Predict Diagnosis</button>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+async function predict() {
+    let symptoms = document.getElementById("symptoms").value;
+
+    let response = await fetch("/api/v1/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            symptoms: symptoms,
+            user_id: 1
+        })
+    });
+
+    let data = await response.json();
+
+    let output = "";
+
+    if (data.status === "EMERGENCY") {
+        output = `<div class="danger">🚨 EMERGENCY: ${data.message}</div>`;
+    }
+    else if (data.status === "UNCERTAIN") {
+        output = `<div class="warning">
+                    ⚠️ Uncertain Prediction<br>
+                    Disease: ${data.prediction}<br>
+                    Confidence: ${data.confidence}
+                  </div>`;
+    }
+    else {
+        output = `
+        <div class="success">
+            <h3>Prediction Result</h3>
+            <p><b>Disease:</b> ${data.disease}</p>
+            <p><b>Confidence:</b> ${data.confidence}</p>
+            <p><b>Medicine:</b> ${data.medicines.join(", ")}</p>
+        </div>`;
+    }
+
+    document.getElementById("result").innerHTML = output;
+}
+</script>
+
+</body>
+</html>

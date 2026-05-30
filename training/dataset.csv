@@ -1,0 +1,39 @@
+symptoms,disease
+headache blurred dizziness,hypertension
+chest shortness of breath,heart_disease
+fever cough headache pain,flu
+fever cough headache body,flu
+swollen legs fatigue reduced,kidney_disease
+pain shortness of breath,heart_disease
+headache vision dizziness,hypertension
+vomiting abdominal pain,food_poisoning
+headache blurred vision dizziness,hypertension
+swollen legs fatigue reduced urine,kidney_disease
+nausea vomiting pain,food_poisoning
+chest pain shortness of breath,heart_disease
+frequent urination excessive thirst,diabetes
+chest pain shortness breath,heart_disease
+chest pain shortness of,heart_disease
+frequent urination excessive,diabetes
+swollen legs reduced urine,kidney_disease
+high fever chills sweating,malaria
+urination excessive thirst,diabetes
+fever cough headache body pain,flu
+high chills sweating,malaria
+chest pain of breath,heart_disease
+fever chills sweating,malaria
+cough headache body pain,flu
+high fever sweating,malaria
+swollen fatigue reduced urine,kidney_disease
+fever headache body pain,flu
+frequent urination thirst,diabetes
+nausea abdominal pain,food_poisoning
+headache blurred vision,hypertension
+fever cough body pain,flu
+blurred vision dizziness,hypertension
+nausea vomiting abdominal pain,food_poisoning
+frequent excessive thirst,diabetes
+high fever chills,malaria
+swollen legs fatigue urine,kidney_disease
+nausea vomiting abdominal,food_poisoning
+legs fatigue reduced urine,kidney_disease
